@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 // Função que mostra o form de filme.
 const mostrarFilmeForm = ref(false);
@@ -95,6 +95,31 @@ const filmesFiltrados = computed(() => {
   return catalogoFilmes.value.filter(filme => filme.generoFilme === filtroGeneroAtual.value);
 });
 
+// ARMAZENAMENTO DE DADOS //
+watch(catalogoFilmes, (novoValor, antigoValor) => {
+  localStorage.setItem("vueflix-filmes",JSON.stringify(novoValor))
+},
+{ deep: true}
+);
+
+watch(filtrosGeneros, (novoValor, antigoValor) => {
+  localStorage.setItem("vueflix-generos",JSON.stringify(novoValor))
+},
+{ deep: true}
+);
+
+onMounted(() => {
+  const filmesLocalStorage = localStorage.getItem("vueflix-filmes");
+  const generosLocalStorage = localStorage.getItem("vueflix-generos");
+
+  if (filmesLocalStorage) {
+    catalogoFilmes.value = JSON.parse(filmesLocalStorage);
+  }
+
+  if (generosLocalStorage) {
+    filtrosGeneros.value = JSON.parse(generosLocalStorage);
+  }
+});
 </script>
 
 <template>
