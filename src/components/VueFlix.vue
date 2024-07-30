@@ -1,33 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 // Função que mostra o form de filme.
 const mostrarFilmeForm = ref(false);
 
-// Array que reune os filmes.
-const catalogoFilmes = ref([
-  {
-    anoFilme: '2024',
-    generoFilme: 'Ação',
-    avaliacaoFilme: true,
-    nomeFilme: 'morto piscina e logan',
-    imgFilme: 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
-  },
-  {
-    anoFilme: '2024',
-    generoFilme: 'Ação',
-    avaliacaoFilme: false,
-    nomeFilme: 'morto piscina e logan',
-    imgFilme: 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
-  },
-  {
-    anoFilme: '2024',
-    generoFilme: 'Ação',
-    avaliacaoFilme: false,
-    nomeFilme: 'morto piscina e logan',
-    imgFilme: 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
-  },
-]);
+// Array que reúne os filmes.
+const catalogoFilmes = ref([]);
 
 // Função que adiciona o filme.
 // Inputs
@@ -36,11 +14,12 @@ const inputImgFilme = ref("");
 const inputAnoFilme = ref("");
 const inputGeneroFilme = ref("");
 
-// Função.
+// Função que adiciona um filme ao catálogo.
 const adicionarFilme = () => {
-  const vazio = "";
+  const vazio = ref("");
+  const generoExistente = ref("");
 
-  switch (vazio) {
+  switch (vazio.value) {
     case inputNomeFilme.value:
       alert("É necessário um título para o filme!");
       break;
@@ -66,14 +45,16 @@ const adicionarFilme = () => {
         avaliacaoFilme: false,
       });
 
+      // Verificar se o gênero já está na lista de filtros
+      generoExistente.value = filtrosGeneros.value.find(genero => genero.nomeGenero === inputGeneroFilme.value);
+      if (!generoExistente.value) {
+        filtrosGeneros.value.push({ nomeGenero: inputGeneroFilme.value });
+      }
+
       limpaCampos();
   }
 };
-const cancelaConfirma = () => {
-  if (dangerConfirm()) {
-    limpaCampos();
-  }
-};
+
 // Função que limpa os campos de inclusão de filme.
 const limpaCampos = () => {
   inputNomeFilme.value = "";
@@ -85,8 +66,14 @@ const limpaCampos = () => {
 
 // Função que exclui o filme do catálogo.
 const excluirFilme = (index) => {
-  if (dangerConfirm()) {
-    catalogoFilmes.value.splice(index, 1);
+  const generoParaRemover = catalogoFilmes.value[index].generoFilme;
+  catalogoFilmes.value.splice(index, 1);
+
+  // Verificar se o gênero ainda existe em outros filmes.
+  const aindaExisteGenero = catalogoFilmes.value.some(filme => filme.generoFilme === generoParaRemover);
+
+  if (!aindaExisteGenero) {
+    filtrosGeneros.value = filtrosGeneros.value.filter(genero => genero.nomeGenero !== generoParaRemover);
   }
 };
 
@@ -95,20 +82,33 @@ const avaliarFilme = (index, avaliacaoFilme) => {
   catalogoFilmes.value[index].avaliacaoFilme = avaliacaoFilme;
 };
 
-// Função de confirmação de ação perigosa.
-const dangerConfirm = () => {
-  return confirm("Você tem certeza que deseja fazer isso?");
-};
+// FILTROS //
+// Filtrar por gênero.
+const filtrosGeneros = ref([]);
+const filtroGeneroAtual = ref("Todos");
+
+// Função
+const filmesFiltrados = computed(() => {
+  if (filtroGeneroAtual.value === 'Todos') {
+    return catalogoFilmes.value;
+  }
+  return catalogoFilmes.value.filter(filme => filme.generoFilme === filtroGeneroAtual.value);
+});
 
 </script>
+
 <template>
   <div class="vueflix">
     <div class="acoes-usuario">
       <div class="filtros">
         <div class="titulo">Filtrar</div>
         <div class="opcoes-filtros">
-          <button class="botao ativo">Todos</button>
-          <!-- Filter buttons logic can be implemented here if needed -->
+          <button class="botao" :class="{ativo: filtroGeneroAtual === 'Todos'}" @click="filtroGeneroAtual = 'Todos'">Todos</button>
+          <!-- Adiciona os botões de filtro para cada gênero -->
+          <button v-for="genero in filtrosGeneros" :key="genero.nomeGenero" class="botao" 
+          :class="{ativo: filtroGeneroAtual === genero.nomeGenero}" @click="filtroGeneroAtual = genero.nomeGenero">
+            {{ genero.nomeGenero }}
+          </button>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ const dangerConfirm = () => {
           <input v-model="inputGeneroFilme" type="text" autocomplete="off" placeholder="Gênero" required />
           <div class="acoes">
             <button class="botao ativo" @click="adicionarFilme">Salvar</button>
-            <button class="botao danger ativo" @click="cancelaConfirma">Cancelar</button>
+            <button class="botao danger ativo" @click="limpaCampos">Cancelar</button>
           </div>
         </div>
         <button v-else class="botao ativo" @click="mostrarFilmeForm = true">Adicionar Filme</button>
@@ -128,7 +128,7 @@ const dangerConfirm = () => {
     </div>
 
     <div class="filmes">
-      <div v-for="(filme, index) in catalogoFilmes" :key="index" class="filme">
+      <div v-for="(filme, index) in filmesFiltrados" :key="index" class="filme">
         <div class="capa-container">
           <div class="acoes-filme">
             <button class="botao" @click="avaliarFilme(index, true)" :class="{ativo: filme.avaliacaoFilme === true}">Gostei</button>
