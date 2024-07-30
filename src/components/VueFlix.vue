@@ -26,10 +26,54 @@ const catalogoFilmes = ref([
 ]);
 
 // Função que adiciona o filme.
+// Inputs
+const inputNomeFilme = ref ("");
+const inputImgFilme = ref ("");
+const inputAnoFilme = ref ("");
+const inputGeneroFilme = ref ("");
 
-
+// Função.
 const adicionarFilme = () => {
+  const vazio = "";
+
+  switch(vazio) {
+  case inputNomeFilme.value:
+    alert("É necessário um título para o filme!");
+    break;
+
+  case inputImgFilme.value:
+    alert("É necessário uma imagem para o filme!");
+    break;
+
+    case inputAnoFilme.value:
+    alert("É necessário um ano para o filme!");
+    break;
+
+  case inputGeneroFilme.value:
+    alert("É necessário um gênero para o filme!");
+    break;    
+
+  default:
+  catalogoFilmes.value.push({
+    nomeFilme: inputNomeFilme.value,
+    imgFilme: inputImgFilme.value,
+    anoFilme: inputAnoFilme.value,
+    generoFilme: inputGeneroFilme.value,
+  });
+
+  limpaCampos();
+}};
+
+// Função que limpa os campos de inclusão de filme.
+const limpaCampos = () => {
+  inputNomeFilme.value = "";
+  inputImgFilme.value = "";
+  inputAnoFilme.value = "";
+  inputGeneroFilme.value = "";
+  mostrarFilmeForm.value = false;
 };
+
+// Função
 
 // Função que filtra os filmes.
 
@@ -50,13 +94,13 @@ const adicionarFilme = () => {
 
       <div class="novo-filme">
         <div v-if="mostrarFilmeForm" class="adicionar-filme">
-          <input v-model="inputNomeFilme" type="text" autocomplete="off" placeholder="Nome do Filme" />
-          <input v-model="inputImgFilme" type="text" autocomplete="off" placeholder="URL da Imagem" />
-          <input v-model="inputAnoFilme" type="text" autocomplete="off" placeholder="Ano de Lançamento" />
-          <input v-model="inputGeneroFilme" type="text" autocomplete="off" placeholder="Gênero" />
+          <input v-model="inputNomeFilme" type="text" autocomplete="off" placeholder="Nome do Filme" required />
+          <input v-model="inputImgFilme" type="text" autocomplete="off" placeholder="URL da Imagem" required />
+          <input v-model="inputAnoFilme" type="text" autocomplete="off" placeholder="Ano de Lançamento" required />
+          <input v-model="inputGeneroFilme" type="text" autocomplete="off" placeholder="Gênero" required />
           <div class="acoes">
             <button class="botao ativo" @click="adicionarFilme">Salvar</button>
-            <button class="botao danger ativo" @click="mostrarFilmeForm = false" >Cancelar</button>
+            <button class="botao danger ativo" @click="limpaCampos" >Cancelar</button>
           </div>
         </div>
         <button v-else class="botao ativo" @click="mostrarFilmeForm = true">Adicionar Filme</button>
