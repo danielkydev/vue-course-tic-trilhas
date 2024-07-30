@@ -1,5 +1,6 @@
 <script setup>
-import VueFlix from './components/VueFlix.vue'
+import VueFlix from './components/VueFlix.vue';
+import './styles.scss';
 </script>
 
 <template>

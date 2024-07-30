@@ -1,5 +1,40 @@
 <script setup>
-console.log('VueFlix')
+import { ref } from 'vue';
+// Função que mostra o form de filme.
+const mostrarFilmeForm = ref(false);
+
+// Array que reune os filmes.
+const catalogoFilmes = ref([
+  {
+    nomeFilme: 'morto piscina e logan',
+    imgFilme: 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
+    anoFilme: '2024',
+    generoFilme: 'Ação',
+  },
+  {
+    nomeFilme: '22222',
+    imgFilme: 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
+    anoFilme: '2024',
+    generoFilme: 'Ação',
+  },
+  {
+    nomeFilme: '333333',
+    imgFilme: 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
+    anoFilme: '2024',
+    generoFilme: 'Ação',
+  }
+]);
+
+// Função que adiciona o filme.
+
+
+const adicionarFilme = () => {
+};
+
+// Função que filtra os filmes.
+
+// Função que avalia o filme.
+
 </script>
 <template>
   <div class="vueflix">
@@ -14,99 +49,33 @@ console.log('VueFlix')
       </div>
 
       <div class="novo-filme">
-        <!-- <div class="adicionar-filme">
-          <input type="text" autocomplete="off" placeholder="Nome do Filme" />
-          <input type="text" autocomplete="off" placeholder="URL da Imagem" />
-          <input type="text" autocomplete="off" placeholder="Ano de Lançamento" />
-          <input type="text" autocomplete="off" placeholder="Gênero" />
+        <div v-if="mostrarFilmeForm" class="adicionar-filme">
+          <input v-model="inputNomeFilme" type="text" autocomplete="off" placeholder="Nome do Filme" />
+          <input v-model="inputImgFilme" type="text" autocomplete="off" placeholder="URL da Imagem" />
+          <input v-model="inputAnoFilme" type="text" autocomplete="off" placeholder="Ano de Lançamento" />
+          <input v-model="inputGeneroFilme" type="text" autocomplete="off" placeholder="Gênero" />
           <div class="acoes">
-            <button class="botao ativo">Salvar</button>
-            <button class="botao danger ativo">Cancelar</button>
+            <button class="botao ativo" @click="adicionarFilme">Salvar</button>
+            <button class="botao danger ativo" @click="mostrarFilmeForm = false" >Cancelar</button>
           </div>
-        </div> -->
-        <button class="botao ativo">Adicionar Filme</button>
+        </div>
+        <button v-else class="botao ativo" @click="mostrarFilmeForm = true">Adicionar Filme</button>
       </div>
     </div>
 
     <div class="filmes">
-      <div class="filme">
+      <div v-for="filme in catalogoFilmes" :key="filme.id" class="filme">
         <div class="capa-container">
           <div class="acoes-filme">
             <button class="botao">Gostei</button>
             <button class="botao danger">Não Gostei</button>
             <button class="botao danger">Excluir</button>
           </div>
-          <img
-            class="capa"
-            src="https://www.themoviedb.org/t/p/w600_and_h900_bestv2/eqNdWOXUuTWefYMycWz7dVE0Irv.jpg"
-            alt=""
-          />
+          <img class="capa" :src="filme.imgFilme" alt="" />
         </div>
-        <div class="nome">Vue.js: The Documentary</div>
-        <div class="info">24/02/2020 - Documentário</div>
+        <div class="nome">{{ filme.nomeFilme }}</div>
+        <div class="info">{{filme.anoFilme}} - {{ filme.generoFilme }}</div>
       </div>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.vueflix {
-  padding: 16px;
-
-  .acoes-usuario {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    margin: 30px 0;
-
-    .adicionar-filme {
-      display: flex;
-    }
-  }
-
-  .filmes {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    min-height: 350px;
-
-    .filme {
-      .capa-container {
-        width: 200px;
-        height: auto;
-        position: relative;
-        .capa {
-          width: 100%;
-          height: 100%;
-        }
-
-        .acoes-filme {
-          position: absolute;
-          bottom: 0;
-          padding-bottom: 12px;
-          background-image: linear-gradient(to bottom, rgba(255, 0, 0, 0), rgb(0, 0, 0));
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          height: 100%;
-          justify-content: flex-end;
-        }
-      }
-
-      .nome {
-        font-weight: bold;
-      }
-
-      .info {
-        font-size: 12px;
-      }
-
-      &:hover {
-        .acoes-filme {
-          display: flex;
-        }
-      }
-    }
-  }
-}
-</style>
